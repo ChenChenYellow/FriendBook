@@ -75,12 +75,94 @@ namespace FriendBook
 
         protected void btnSearch_Click(object sender, EventArgs e)
         {
+            StringBuilder ret = new StringBuilder("select client.* from client, client_language where ");
+            if (cboGender.SelectedItem!=null)
+            {
+                ret.Append("(");
+                foreach (ListItem item in cboGender.Items)
+                {
+                    if (item.Selected)
+                    {
+                        ret.Append("client.gender_id = " + item.Value + " or ");
+                    }
+                }
+                ret = ret.Remove(ret.Length - 3, 3);
+                ret.Append(") and ");
+            }else
+            {
+                lblTest.Text = "Select at least a gender";
+                return;
+            }
+
+            if (cboCity.SelectedItem != null)
+            {
+                ret.Append("(");
+                foreach (ListItem item in cboCity.Items)
+                {
+                    if (item.Selected)
+                    {
+                        ret.Append("client.city_id = " + item.Value + " or ");
+                    }
+                }
+                ret = ret.Remove(ret.Length - 3, 3);
+                ret.Append(") and ");
+            }
+            else
+            {
+                lblTest.Text = "Select at least a city";
+                return;
+            }
+
+
+            if (cboRace.SelectedItem != null)
+            {
+                ret.Append("(");
+                foreach (ListItem item in cboRace.Items)
+                {
+                    if (item.Selected)
+                    {
+                        ret.Append("client.race_id = " + item.Value + " or ");
+                    }
+                }
+                ret = ret.Remove(ret.Length - 3, 3);
+                ret.Append(") and ");
+            }
+            else
+            {
+                lblTest.Text = "Select at least a race";
+                return;
+            }
+
+
+
+            if (cboLanguage.SelectedItem != null)
+            {
+                ret.Append("(");
+                foreach (ListItem item in cboLanguage.Items)
+                {
+                    if (item.Selected)
+                    {
+                        ret.Append("(client_language.language_id = " + item.Value + " and client_language.client_username = client.client_username) and ");
+                    }
+                }
+                ret = ret.Remove(ret.Length - 4, 4);
+                ret.Append(")");
+            }
+            else
+            {
+                lblTest.Text = "Select at least a language";
+                return;
+            }
+
+
             OleDbConnection myCon = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\User\Desktop\YuChen\Programming\Internet\FriendBook\FriendBook\App_data\Friend_Book_Data.mdb;Persist Security Info=True");
             myCon.Open();
-            StringBuilder ret = new StringBuilder("select client.* from client, client_language where ");
-            OleDbDataAdapter adapter = new OleDbDataAdapter("select * from client", myCon);
+            myCon.Close();
+            lblTest.Text = ret.ToString();
+
+            OleDbDataAdapter adapter = new OleDbDataAdapter(ret.ToString(), myCon);
             DataSet myDataSet = new DataSet();
-            DataTable table = new DataTable("client");
+            DataTable table = new DataTable("searched_Client");
         }
 
         protected void cboSearch_SelectedIndexChanged(object sender, EventArgs e)
