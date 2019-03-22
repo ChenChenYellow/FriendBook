@@ -25,7 +25,7 @@
                     <asp:TableCell CssClass="col-6">
                         <asp:Panel runat="server" ID="searchPanel">
                             <asp:RadioButtonList runat="server" ID="cboSearch" RepeatColumns="2" AutoPostBack="true" OnSelectedIndexChanged="cboSearch_SelectedIndexChanged">
-                                <asp:ListItem Text="Search with Username" Value="Username"></asp:ListItem>
+                                <asp:ListItem Selected="True" Text="Search with Username" Value="Username"></asp:ListItem>
                                 <asp:ListItem Text="Search with Criteria" Value="Criteria"></asp:ListItem>
                             </asp:RadioButtonList>
                             <asp:Panel runat="server" ID="usernamePanel" CssClass="input-group">
@@ -34,12 +34,12 @@
                                 </div>
                                 <asp:TextBox runat="server" ID="txtUsername" CssClass="form-control"></asp:TextBox>
                             </asp:Panel>
-                            <asp:Panel runat="server" ID="criteriaPanel">
+                            <asp:Panel runat="server" ID="criteriaPanel" Visible="false">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span>Gender</span>
                                     </div>
-                                    <asp:CheckBoxList runat="server" ID="cboGender" CssClass="form-control scrollBox" RepeatColumns="3" CellPadding="10" CellSpacing="10">
+                                    <asp:CheckBoxList runat="server" ID="cboGender" CssClass="form-control scrollBox" RepeatColumns="3" CellPadding="10" CellSpacing="10" OnSelectedIndexChanged="cboGender_SelectedIndexChanged" AutoPostBack="true">
                                     </asp:CheckBoxList>
                                     <asp:RadioButtonList runat="server" ID="cboSelectAllGender" CssClass="input-group-append" OnSelectedIndexChanged="cboSelectAllGender_SelectedIndexChanged" AutoPostBack="true">
                                         <asp:ListItem Text="Select All" Value="All"></asp:ListItem>
@@ -50,7 +50,7 @@
                                     <div class="input-group-prepend">
                                         <span>City</span>
                                     </div>
-                                    <asp:CheckBoxList runat="server" ID="cboCity" CssClass="form-control scrollBox" RepeatColumns="3" CellPadding="10" CellSpacing="10">
+                                    <asp:CheckBoxList runat="server" ID="cboCity" CssClass="form-control scrollBox" RepeatColumns="3" CellPadding="10" CellSpacing="10" OnSelectedIndexChanged="cboCity_SelectedIndexChanged" AutoPostBack="true">
                                     </asp:CheckBoxList>
                                     <asp:RadioButtonList runat="server" ID="cboSelectAllCity" CssClass="input-group-append" OnSelectedIndexChanged="cboSelectAllCity_SelectedIndexChanged" AutoPostBack="true">
                                         <asp:ListItem Text="Select All" Value="All"></asp:ListItem>
@@ -61,7 +61,7 @@
                                     <div class="input-group-prepend">
                                         <span>Race</span>
                                     </div>
-                                    <asp:CheckBoxList runat="server" ID="cboRace" CssClass="form-control scrollBox" RepeatColumns="3" CellPadding="10" CellSpacing="10">
+                                    <asp:CheckBoxList runat="server" ID="cboRace" CssClass="form-control scrollBox" RepeatColumns="3" CellPadding="10" CellSpacing="10" OnSelectedIndexChanged ="cboRace_SelectedIndexChanged" AutoPostBack="true">
                                     </asp:CheckBoxList>
                                     <asp:RadioButtonList runat="server" ID="cboSelectAllRace" CssClass="input-group-append" OnSelectedIndexChanged="cboSelectAllRace_SelectedIndexChanged" AutoPostBack="true">
                                         <asp:ListItem Text="Select All" Value="All"></asp:ListItem>
@@ -72,7 +72,7 @@
                                     <div class="input-group-prepend">
                                         <span>Language</span>
                                     </div>
-                                    <asp:CheckBoxList runat="server" ID="cboLanguage" CssClass="form-control scrollBox" RepeatColumns="3" CellPadding="10" CellSpacing="10">
+                                    <asp:CheckBoxList runat="server" ID="cboLanguage" CssClass="form-control scrollBox" RepeatColumns="3" CellPadding="10" CellSpacing="10" OnSelectedIndexChanged="cboLanguage_SelectedIndexChanged" AutoPostBack="true">
                                     </asp:CheckBoxList>
                                     <asp:RadioButtonList runat="server" ID="cboSelectAllLanguage" CssClass="input-group-append" OnSelectedIndexChanged="cboSelectAllLanguage_SelectedIndexChanged" AutoPostBack="true">
                                         <asp:ListItem Text="Select All" Value="All"></asp:ListItem>
@@ -103,6 +103,7 @@
             </asp:Table>
 
         </div>
+    <asp:GridView ID="GridView1" runat="server"></asp:GridView>
     </form>
     <asp:Label ID="lblTest" runat="server" />
 </body>
