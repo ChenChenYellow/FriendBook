@@ -104,5 +104,6 @@
 
         </div>
     </form>
+    <asp:Label ID="lblTest" runat="server" />
 </body>
 </html>
