@@ -65,7 +65,7 @@ namespace FriendBook
                 myRead = myComd.ExecuteReader();
                 cboLanguage.DataSource = myRead;
                 cboLanguage.DataValueField = "language_id";
-                cboLanguage.DataTextField = "language_id";
+                cboLanguage.DataTextField = "language_name";
                 cboLanguage.DataBind();
                 myRead.Close();
                 myCon.Close();
@@ -75,94 +75,108 @@ namespace FriendBook
 
         protected void btnSearch_Click(object sender, EventArgs e)
         {
-            StringBuilder ret = new StringBuilder("select client.* from client, client_language where ");
-            if (cboGender.SelectedItem!=null)
+            StringBuilder ret = new StringBuilder("");
+            if (cboSearch.SelectedItem.Value.Equals("Username"))
             {
-                ret.Append("(");
-                foreach (ListItem item in cboGender.Items)
+                if (txtUsername.Text.Equals(""))
                 {
-                    if (item.Selected)
-                    {
-                        ret.Append("client.gender_id = " + item.Value + " or ");
-                    }
+                    lblTest.Text = "Enter a username";
                 }
-                ret = ret.Remove(ret.Length - 3, 3);
-                ret.Append(") and ");
-            }else
-            {
-                lblTest.Text = "Select at least a gender";
-                return;
-            }
-
-            if (cboCity.SelectedItem != null)
-            {
-                ret.Append("(");
-                foreach (ListItem item in cboCity.Items)
+                else
                 {
-                    if (item.Selected)
-                    {
-                        ret.Append("client.city_id = " + item.Value + " or ");
-                    }
+                    ret.Append("select * from client where client_username = '" + txtUsername.Text + "'");
                 }
-                ret = ret.Remove(ret.Length - 3, 3);
-                ret.Append(") and ");
             }
-            else
+            else if (cboSearch.SelectedItem.Value.Equals("Criteria"))
             {
-                lblTest.Text = "Select at least a city";
-                return;
-            }
-
-
-            if (cboRace.SelectedItem != null)
-            {
-                ret.Append("(");
-                foreach (ListItem item in cboRace.Items)
+                ret.Append("select client.* from client where ");
+                if (cboGender.SelectedItem != null)
                 {
-                    if (item.Selected)
+                    ret.Append("(client.gender_id in ( ");
+                    foreach (ListItem item in cboGender.Items)
                     {
-                        ret.Append("client.race_id = " + item.Value + " or ");
+                        if (item.Selected)
+                        {
+                            ret.Append(item.Value + " , ");
+                        }
                     }
+                    ret = ret.Remove(ret.Length - 2, 2);
+                    ret.Append(")) and ");
                 }
-                ret = ret.Remove(ret.Length - 3, 3);
-                ret.Append(") and ");
-            }
-            else
-            {
-                lblTest.Text = "Select at least a race";
-                return;
-            }
-
-
-
-            if (cboLanguage.SelectedItem != null)
-            {
-                ret.Append("(");
-                foreach (ListItem item in cboLanguage.Items)
+                else
                 {
-                    if (item.Selected)
-                    {
-                        ret.Append("(client_language.language_id = " + item.Value + " and client_language.client_username = client.client_username) and ");
-                    }
+                    lblTest.Text = "Select at least a gender";
+                    return;
                 }
-                ret = ret.Remove(ret.Length - 4, 4);
-                ret.Append(")");
-            }
-            else
-            {
-                lblTest.Text = "Select at least a language";
-                return;
-            }
 
+                if (cboCity.SelectedItem != null)
+                {
+                    ret.Append("(client.city_id in ( ");
+                    foreach (ListItem item in cboCity.Items)
+                    {
+                        if (item.Selected)
+                        {
+                            ret.Append(item.Value + " , ");
+                        }
+                    }
+                    ret = ret.Remove(ret.Length - 2, 2);
+                    ret.Append(")) and ");
+                }
+                else
+                {
+                    lblTest.Text = "Select at least a city";
+                    return;
+                }
 
+                if (cboRace.SelectedItem != null)
+                {
+                    ret.Append("(client.race_id in ( ");
+                    foreach (ListItem item in cboRace.Items)
+                    {
+                        if (item.Selected)
+                        {
+                            ret.Append(item.Value + " , ");
+                        }
+                    }
+                    ret = ret.Remove(ret.Length - 2, 2);
+                    ret.Append(")) and ");
+                }
+                else
+                {
+                    lblTest.Text = "Select at least a race";
+                    return;
+                }
+
+                if (cboLanguage.SelectedItem != null)
+                {
+                    ret.Append("(");
+                    foreach (ListItem item in cboLanguage.Items)
+                    {
+                        if (item.Selected)
+                        {
+                            ret.Append("(exists (select * from client_language where client.client_username = client_language.client_username and client_language.language_id = " + item.Value.ToString() + " )) and ");
+                        }
+                    }
+                    ret = ret.Remove(ret.Length - 4, 4);
+                    ret.Append(")");
+                }
+                else
+                {
+                    lblTest.Text = "Select at least a language";
+                    return;
+                }
+            }
             OleDbConnection myCon = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\User\Desktop\YuChen\Programming\Internet\FriendBook\FriendBook\App_data\Friend_Book_Data.mdb;Persist Security Info=True");
             myCon.Open();
-            myCon.Close();
             lblTest.Text = ret.ToString();
-
+            
             OleDbDataAdapter adapter = new OleDbDataAdapter(ret.ToString(), myCon);
-            DataSet myDataSet = new DataSet();
-            DataTable table = new DataTable("searched_Client");
+            DataTable table = new DataTable("search_client");
+            adapter.Fill(table);
+            GridView1.DataSource = table;
+            GridView1.DataBind();
+            lblTest.Text += table.TableName;
+            myCon.Close();
         }
 
         protected void cboSearch_SelectedIndexChanged(object sender, EventArgs e)
@@ -195,6 +209,26 @@ namespace FriendBook
         protected void cboSelectAllLanguage_SelectedIndexChanged(object sender, EventArgs e)
         {
             selectAll(cboSelectAllLanguage, cboLanguage);
+        }
+
+        protected void cboGender_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cboSelectAllGender.ClearSelection();
+        }
+
+        protected void cboCity_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cboSelectAllCity.ClearSelection();
+        }
+
+        protected void cboRace_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cboSelectAllRace.ClearSelection();
+        }
+
+        protected void cboLanguage_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cboSelectAllLanguage.ClearSelection();
         }
     }
 }
