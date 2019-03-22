@@ -45,7 +45,7 @@ namespace FriendBook
                 myRead = myComd.ExecuteReader();
                 cboLanguage.DataSource = myRead;
                 cboLanguage.DataValueField = "language_id";
-                cboLanguage.DataTextField = "language_id";
+                cboLanguage.DataTextField = "language_name";
                 cboLanguage.DataBind();
                 myRead.Close();
                 myCon.Close();
