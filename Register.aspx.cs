@@ -55,28 +55,6 @@ namespace FriendBook
         {
             return "Select * from " + tableName;
         }
-        protected void cboLanguage_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            StringBuilder ret = new StringBuilder("");
-            foreach (ListItem item in cboLanguage.Items)
-            {
-                if (item.Selected)
-                {
-                    ret.Append(item.Value.ToString());
-                    ret.Append(",");
-                }
-            }
-            if (ret.Length > 1)
-            {
-                ret.Remove(ret.Length - 1, 1);
-                Session.Add("abcc", ret);
-            }
-            else
-            {
-                Session.Add("abcc", "null");
-            }
-            txtUsername.Text = Session["abcc"].ToString();
-        }
         private string quote(string a)
         {
             return "'" + a + "'";
@@ -86,9 +64,21 @@ namespace FriendBook
         {
             OleDbConnection myCon = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\User\Desktop\YuChen\Programming\Internet\FriendBook\FriendBook\App_data\Friend_Book_Data.mdb;Persist Security Info=True");
             myCon.Open();
-            OleDbCommand myComd = new OleDbCommand(selectString("City")+ " where client_username = " + quote(txtUsername.Text), myCon);
+            OleDbCommand myComd = new OleDbCommand(selectString("Client")+ " where client_username = " + quote(txtUsername.Text), myCon);
             OleDbDataReader myRead = myComd.ExecuteReader();
-            if (!myRead.HasRows && txtPassword.Text.Equals(txtRePassword.Text))
+            if (myRead.HasRows)
+            {
+                lblInfo.Text = "Username Exist";
+            }
+            else if (!txtPassword.Text.Equals(txtRePassword.Text))
+            {
+                lblInfo.Text = "Please Enter Correctly the password";
+            }
+            else if (cboLanguage.SelectedItem == null)
+            {
+                lblInfo.Text = "Please Select at least one language";
+            }
+            else
             {
                 myRead.Close();
                 StringBuilder ret = new StringBuilder("");
@@ -117,6 +107,11 @@ namespace FriendBook
             }
             myRead.Close();
             myCon.Close();
+        }
+
+        protected void btnBack_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("index.aspx");
         }
     }
 }

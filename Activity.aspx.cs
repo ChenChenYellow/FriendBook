@@ -35,6 +35,10 @@ namespace FriendBook
         {
             if (!Page.IsPostBack)
             {
+                if (Session["CurrentUser"] == null)
+                {
+                    Response.Redirect("index.aspx");
+                }
                 OleDbConnection myCon = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\User\Desktop\YuChen\Programming\Internet\FriendBook\FriendBook\App_data\Friend_Book_Data.mdb;Persist Security Info=True");
                 myCon.Open();
                 OleDbCommand myComd = new OleDbCommand(selectString("City"), myCon);
@@ -81,15 +85,16 @@ namespace FriendBook
                 if (txtUsername.Text.Equals(""))
                 {
                     lblTest.Text = "Enter a username";
+                    return;
                 }
                 else
                 {
-                    ret.Append("select * from client where client_username = '" + txtUsername.Text + "'");
+                    ret.Append("select client_username from client where client_username = '" + txtUsername.Text + "'");
                 }
             }
             else if (cboSearch.SelectedItem.Value.Equals("Criteria"))
             {
-                ret.Append("select client.* from client where ");
+                ret.Append("select client.client_username from client where ");
                 if (cboGender.SelectedItem != null)
                 {
                     ret.Append("(client.gender_id in ( ");
@@ -168,15 +173,17 @@ namespace FriendBook
             }
             OleDbConnection myCon = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\User\Desktop\YuChen\Programming\Internet\FriendBook\FriendBook\App_data\Friend_Book_Data.mdb;Persist Security Info=True");
             myCon.Open();
-            lblTest.Text = ret.ToString();
             
             OleDbDataAdapter adapter = new OleDbDataAdapter(ret.ToString(), myCon);
             DataTable table = new DataTable("search_client");
             adapter.Fill(table);
-            GridView1.DataSource = table;
-            GridView1.DataBind();
-            lblTest.Text += table.TableName;
+            
+            listBoxResult.DataSource = table;
+            listBoxResult.DataTextField = "client_username";
+            listBoxResult.DataValueField = "client_username";
+            listBoxResult.DataBind();
             myCon.Close();
+            resultPanel.Visible = true;
         }
 
         protected void cboSearch_SelectedIndexChanged(object sender, EventArgs e)
@@ -229,6 +236,59 @@ namespace FriendBook
         protected void cboLanguage_SelectedIndexChanged(object sender, EventArgs e)
         {
             cboSelectAllLanguage.ClearSelection();
+        }
+
+        protected void btnChat_Click(object sender, EventArgs e)
+        {
+            if (listBoxResult.SelectedIndex > -1)
+            {
+                messagePanel.Visible = true;
+
+                foreach (ListItem item in cboReceipiants.Items)
+                {
+                    if (item.Value.Equals(listBoxResult.SelectedItem.Value))
+                    {
+                        item.Selected = true;
+                        return;
+                    }
+                }
+                ListItem temp = new ListItem();
+                temp.Text = listBoxResult.SelectedItem.Value;
+                temp.Value = listBoxResult.SelectedItem.Value;
+                temp.Selected = true;
+                cboReceipiants.Items.Add(temp);
+            }
+        }
+        
+        protected void btnSend_Click(object sender, EventArgs e)
+        {
+            OleDbConnection myCon = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\User\Desktop\YuChen\Programming\Internet\FriendBook\FriendBook\App_data\Friend_Book_Data.mdb;Persist Security Info=True");
+            myCon.Open();
+            string sql;
+            foreach (ListItem item in cboReceipiants.Items)
+            {
+                if (item.Selected)
+                {sql = "insert into Message(sender_username, receiver_username, message_title, message_content, sending_time) values ('";
+            sql += Session["CurrentUser"] + "', '" + item.Value + "', '" + txtMessageTitle.Text + "', '" + txtMessage.Text + "', Now())";
+            OleDbCommand myCom = new OleDbCommand(sql, myCon);
+            myCom.ExecuteNonQuery();
+
+                }
+            }
+            
+            lblSend.Text = "Message Send";
+
+        }
+
+        protected void btnLogin_Click(object sender, EventArgs e)
+        {
+            Session.Remove("CurrentUser");
+            Response.Redirect("index.aspx");
+        }
+
+        protected void btnReadMessage_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("ReadingMessage.aspx");
         }
     }
 }

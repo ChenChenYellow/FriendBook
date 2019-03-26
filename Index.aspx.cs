@@ -25,9 +25,13 @@ namespace FriendBook
             myCon.Open();
             OleDbCommand myComd = new OleDbCommand("select client_username from client where client_username = " + quote(txtUsername.Text) + " and client_password = " + quote(txtPassword.Text), myCon);
             OleDbDataReader myRead = myComd.ExecuteReader();
-            if (myRead.HasRows)
+            if (myRead.Read())
             {
-
+                Session["CurrentUser"] = myRead["client_username"];
+                Response.Redirect("Activity.aspx");
+            }else
+            {
+                lblInfo.Text = "Wrong Username or Password";
             }
         }
     }
